@@ -65,7 +65,7 @@ fn gen_upp(stats: &[u8; 6]) -> String {
 // Take a gender string and return an appropriate name string.
 fn gen_name(gender: &str) -> String {
     // Eventually this will hit the Names database.
-    let mut f_name = "";
+    let f_name;
     if gender == "m" {
         f_name = "Fred";
     } else {
@@ -140,24 +140,20 @@ struct Character {
 
 #[test]
 fn test_roll() {
-    let mut counter = 0;
     // a is a range, and the end of the range is not in the range.
     let a = 1..7;
     // Run this test 100 times to make sure it hits the edges.
-    while counter < 100 {
-        counter = counter + 1;
+    for _counter in 1..100 {
         assert!(a.contains(&roll()));
     }
 }
 
 #[test]
 fn test_gender() {
-    let mut counter = 0;
     let mut a: Vec<String> = Vec::new();
     a.push("m".to_string());
     a.push("f".to_string());
-    while counter < 100 {
-        counter = counter + 1;
+    for _counter in 1..100 {
         assert!(a.contains(&gen_gender()));
     }
 }
@@ -165,13 +161,11 @@ fn test_gender() {
 #[test]
 fn test_mutable_character() {
     let mut names: Vec<String> = Vec::new();
-    let mut counter = 0;
     names.push("Fred Flintstone".to_string());
     names.push("Wilma Flintstone".to_string());
     let mut c = build_character();
-    while counter < 10 {
+    for _counter in 1..10 {
         assert!(names.contains(&c.name));
-        counter += 1;
     }
 }
 
