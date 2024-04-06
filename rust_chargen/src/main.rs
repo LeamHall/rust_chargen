@@ -1,7 +1,23 @@
-// Really basic Rust. Get rust via 'rustup', then create a new project with
+// Here is an example of really basic Rust. You can modify this for your own needs.
+//
+// Get rust:
+//      https://www.rust-lang.org/learn/get-started
+//
+// Create a new project with
 //      cargo new chargen
 //
-// Then go into the chargen directory and edit src/main.rs as below.
+// Go into the chargen directory.
+//
+// Add the following line under the "[dependencies]" section in Cargo.toml:
+//      rand = "0.8.5"
+//
+// Edit src/main.rs as below.
+//
+// Run the tests. Since testing also compiles, this gives a lot of feedback.
+//      cargo test
+//
+// Once the tests pass, format the code to make it Rust standard.
+//      rustfmt
 //
 // After that, run it to see if it works.
 //      cargo run
@@ -9,122 +25,129 @@
 // Then build it.
 //      cargo build
 
-
 // Imported via the Cargo.toml file
+use rand::seq::SliceRandom;
+use rand::thread_rng;
 use rand::Rng;
-// use rand::prelude::SliceRandom;
 
 // Returns an 8 bit unsigned integer.
 // Like Ruby, the last successful command is the return value.
-// Maybe give it a minimum roll option?
-fn roll() -> i8 {
+fn roll() -> u8 {
     rand::thread_rng().gen_range(1..7)
 }
 
 // 2d6 for us Traveller people. Make your own 3d6 for DnD.
-// Needs a modifier.
-fn two_d6() -> i8 {
+fn two_d6() -> u8 {
     roll() + roll()
 }
 
 // Generate gender.
 fn gen_gender() -> String {
-    let options = vec!["m", "f"];
-    let pick = rand::thread_rng().gen_range(0..2);
-    return options[pick].to_string();
+    let options = ["m", "f"];
+    let mut rng = thread_rng();
+    return options.choose(&mut rng).expect("Can't choose").to_string();
+}
+
+// Give a random age.
+fn gen_age() -> u8 {
+    rand::thread_rng().gen_range(13..72)
+}
+
+// Get a hexdigit string from a [u8;6] array.
+fn gen_upp(stats: &[u8; 6]) -> String {
+    let mut upp = "".to_string();
+    for s in stats.iter() {
+        upp += &format!("{:X}", s).to_string();
+    }
+    return upp;
+}
+
+// Take a gender string and return an appropriate name string.
+fn gen_name(gender: &str) -> String {
+    // Eventually this will hit the Names database.
+    let mut f_name = "";
+    if gender == "m" {
+        f_name = "Fred";
+    } else {
+        f_name = "Wilma";
+    }
+    let l_name = "Flintstone";
+    let name = format!("{} {}", f_name, l_name);
+    return name;
 }
 
 // Build the character.
 fn build_character() -> Character {
-    let _name = String::from("Fred");
     let _gender = gen_gender();
-    let _age = 18;
+    let _name = gen_name(&_gender);
+    let _age = gen_age();
     let _stats = gen_stats();
-    let mut character = Character {
+    let _upp = gen_upp(&_stats);
+    let character = Character {
         name: _name,
         gender: _gender,
         age: _age,
         stats: _stats,
-        upp: String::from(""),
+        upp: _upp,
     };
     return character;
 }
 
-
 // Generate the stats.
-fn gen_stats() -> Vec<i8> {
-    let mut stat_block: Vec<i8> = Vec::new();
+fn gen_stats() -> [u8; 6] {
+    let mut stat_block: [u8; 6] = [0; 6];
     let mut i = 0;
-    while i < 6 {
-        // I wonder if there's a better way for a limited iteration?
+    while i < stat_block.len() {
+        stat_block[i] = two_d6();
         i = i + 1;
-        stat_block.push(two_d6());
-    };
+    }
     return stat_block;
+}
+
+// Print the character per CT Supplement 4.
+fn _print(character: &Character) {
+    println!(
+        "{} [{}] (age {}) [{}] ",
+        character.name,
+        character.gender.to_uppercase(),
+        character.age,
+        character.upp
+    );
 }
 
 // The main function is where things happen.
 fn main() {
     // 'mut' means i is mutable, otherwise it would not be.
-    // Starting with pseudo-code to get things in my head.
-    // 
-    // Build a structure (?) to hold all of the data.
-    // - Name (string)
-    // - Gender (string)
-    // - Age (int, but converts to a string)
-    // - stats (some ints)
-    // - UPP (string calculated from stats)
-    //
-    //
+    // When modifyin the character, put 'mut' (no quotes) between "let" and "character".
     let character = build_character();
 
-    println!("{} Age: {} Gender: {}  Stats: {:?}", 
-        character.name, character.age, 
-        character.gender, character.stats);
-    // Assign a gender (M,F)
-    //
-    // Get a name from the database. 
-    //
-    // Assign the name to a string variable. 
-    //
-    // Generate a random age, say 14-65?
-    //
-    // Build the empty collection of six characters.
-    //
-    // Get the roll (above)
-    //
-    // Ensure the roll is within 2-15.
-    //
-    // Convert the roll to a Hexidecimal string character.
-    //
-    // Add the roll to the collection.
-    //
-    // Print the collection.
+    // Print the character.
+    _print(&character);
 }
 
 // The Character struct
 struct Character {
-    name:   String,
+    // There will be a warning about field 'stats' never being read. Ignore it
+    // since we'll eventually modify the stats.
+    name: String,
     gender: String,
-    age:    i8,
-    stats:  Vec<i8>,
-    upp:    String,
+    age: u8,
+    stats: [u8; 6],
+    upp: String,
 }
 
 // Here are the test functions. The "#[test]" is the declaration.
-// It is called with:
-//      cargo test
+
 #[test]
 fn test_roll() {
     let mut counter = 0;
     // a is a range, and the end of the range is not in the range.
     let a = 1..7;
-    // Run this test 100 times. 
+    // Run this test 100 times to make sure it hits the edges.
     while counter < 100 {
         counter = counter + 1;
         assert!(a.contains(&roll()));
     }
-
 }
 
 #[test]
@@ -139,3 +162,27 @@ fn test_gender() {
     }
 }
 
+#[test]
+fn test_mutable_character() {
+    let mut names: Vec<String> = Vec::new();
+    let mut counter = 0;
+    names.push("Fred Flintstone".to_string());
+    names.push("Wilma Flintstone".to_string());
+    let mut c = build_character();
+    while counter < 10 {
+        assert!(names.contains(&c.name));
+        counter += 1;
+    }
+}
+
+#[test]
+fn test_gen_upp() {
+    let s = [7, 8, 9, 10, 11, 12];
+    assert_eq!("789ABC".to_string(), gen_upp(&s));
+}
+
+#[test]
+fn test_gen_name() {
+    assert_eq!(gen_name(&"m"), "Fred Flintstone".to_string());
+    assert_eq!(gen_name(&"f"), "Wilma Flintstone".to_string());
+}
