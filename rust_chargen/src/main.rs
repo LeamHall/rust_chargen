@@ -95,7 +95,7 @@ fn build_character() -> Character {
 
 // Generate the stats.
 fn gen_stats() -> [u8; 6] {
-    let mut stat_block: [u8; 6] = [0; 6];
+    let mut stat_block = [0u8; 6];
     let mut i = 0;
     while i < stat_block.len() {
         stat_block[i] = two_d6();
