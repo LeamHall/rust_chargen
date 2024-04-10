@@ -104,27 +104,6 @@ fn gen_stats() -> [u8; 6] {
     return stat_block;
 }
 
-// Print the character per CT Supplement 4.
-fn _print(character: &Character) {
-    println!(
-        "{} [{}] (age {}) [{}] ",
-        character.name,
-        character.gender.to_uppercase(),
-        character.age,
-        character.upp
-    );
-}
-
-// The main function is where things happen.
-fn main() {
-    // 'mut' means i is mutable, otherwise it would not be.
-    // When modifyin the character, put 'mut' (no quotes) between "let" and "character".
-    let character = build_character();
-
-    // Print the character.
-    _print(&character);
-}
-
 // The Character struct
 struct Character {
     // There will be a warning about field 'stats' never being read. Ignore it
@@ -136,8 +115,29 @@ struct Character {
     upp: String,
 }
 
-// Here are the test functions. The "#[test]" is the declaration.
+impl Character {
+    fn show(&self) -> String {
+        return format!(
+            "{} [{}] (age {}) [{}]",
+            self.name,
+            self.gender.to_uppercase(),
+            self.age,
+            self.upp
+        );
+    }
+}
 
+// The main function is where things happen.
+fn main() {
+    // 'mut' means i is mutable, otherwise it would not be.
+    // When modifyin the character, put 'mut' (no quotes) between "let" and "character".
+    let character = build_character();
+
+    // Print the character.
+    println!("{}", character.show());
+}
+
+// Here are the test functions. The "#[test]" is the declaration.
 #[test]
 fn test_roll() {
     // a is a range, and the end of the range is not in the range.
@@ -179,4 +179,18 @@ fn test_gen_upp() {
 fn test_gen_name() {
     assert_eq!(gen_name(&"m"), "Fred Flintstone".to_string());
     assert_eq!(gen_name(&"f"), "Wilma Flintstone".to_string());
+}
+
+#[test]
+fn test_character_show() {
+    let _stats: [u8; 6] = [8, 9, 12, 7, 10, 12];
+    let al = Character {
+        name: "Al Lefron".to_string(),
+        age: 22,
+        gender: "f".to_string(),
+        stats: _stats,
+        upp: gen_upp(&_stats),
+    };
+    let expected = String::from("Al Lefron [F] (age 22) [89C7AC]");
+    assert_eq!(expected, al.show());
 }
