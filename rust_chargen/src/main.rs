@@ -59,21 +59,15 @@ fn gen_upp(stats: &[u8; 6]) -> String {
     for s in stats.iter() {
         upp += &format!("{:X}", s).to_string();
     }
-    return upp;
+    upp
 }
 
 // Take a gender string and return an appropriate name string.
 fn gen_name(gender: &str) -> String {
     // Eventually this will hit the Names database.
-    let f_name;
-    if gender == "m" {
-        f_name = "Fred";
-    } else {
-        f_name = "Wilma";
-    }
+    let f_name = if gender == "m" { "Fred" } else { "Wilma" };
     let l_name = "Flintstone";
-    let name = format!("{} {}", f_name, l_name);
-    return name;
+    format!("{} {}", f_name, l_name)
 }
 
 // Build the character.
@@ -90,7 +84,7 @@ fn build_character() -> Character {
         stats: _stats,
         upp: _upp,
     };
-    return character;
+    character
 }
 
 // Generate the stats.
@@ -99,9 +93,9 @@ fn gen_stats() -> [u8; 6] {
     let mut i = 0;
     while i < stat_block.len() {
         stat_block[i] = two_d6();
-        i = i + 1;
+        i += 1;
     }
-    return stat_block;
+    stat_block
 }
 
 // The Character struct
@@ -117,20 +111,20 @@ struct Character {
 
 impl Character {
     fn show(&self) -> String {
-        return format!(
+        format!(
             "{} [{}] (age {}) [{}]",
             self.name,
             self.gender.to_uppercase(),
             self.age,
             self.upp
-        );
+        )
     }
 }
 
 // The main function is where things happen.
 fn main() {
     // 'mut' means i is mutable, otherwise it would not be.
-    // When modifyin the character, put 'mut' (no quotes) between "let" and "character".
+    // When modifying the character, put 'mut' (no quotes) between "let" and "character".
     let character = build_character();
 
     // Print the character.
