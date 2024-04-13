@@ -10,6 +10,7 @@ fn runs() {
     cmd.assert().success();
 }
 
+#[test]
 fn prints_some_text() -> Result<(), Box<dyn std::error::Error>> {
     let mut cmd = Command::cargo_bin("rust_chargen")?;
     let output = cmd.output()?;
